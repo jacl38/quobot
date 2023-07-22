@@ -20,3 +20,9 @@ export async function findImageUrlByTitle(title: string): Promise<string | null>
   const page = Object.values(body.query.pages)[0] as any;
   return page.thumbnail ? page.thumbnail.source : null;
 }
+
+/** Returns the full title of a page, given its `url`. */
+export function TitleFromURL(url: string): string {
+  const parts = url.split("/");
+  return parts[parts.length - 1];
+}
