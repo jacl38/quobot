@@ -13,7 +13,6 @@ export default function TagPage() {
 
   return (
     <>
-    
       {tag.status === "loading" && <p className="opacity-50 text-center">Loading...</p>}
 
       {tag.status === "idle" && (tag.result?.quotes.length ? <>

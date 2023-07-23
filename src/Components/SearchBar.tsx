@@ -35,7 +35,8 @@ const styles = {
   result: `
     px-4 pb-2
     focus:outline-none
-    focus:bg-primary-300
+    focus:bg-primary-200
+    hover:!bg-primary-300
     text-tertiary-800
     font-semibold
     animate-fadeSlideIn

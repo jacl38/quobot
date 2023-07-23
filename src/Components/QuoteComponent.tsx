@@ -17,19 +17,13 @@ const styles = {
   AuthorInfoContainer: twsc.div`
     flex flex-col
   `,
-  AuthorImage: twsc.img<{ $loaded: boolean }>`
-    ${img => img.$loaded ? tw(
-      "animate-fadeIn animation-delay-150"
-    ) : tw(
-      "animate-pulse"
-    )}
-    w-16 h-16 aspect-square rounded-full
-    object-cover object-top
-    border-4 border-secondary-700
-    hover:scale-110
+  AuthorImage: twsc.img`
+    w-full h-full
+    animate-fadeIn
+    bg-cover bg-top
+    group-hover:scale-110 scale-125
     bg-gradient-to-tr from-secondary-200 to-secondary-50
     ease-out transition-all
-    -translate-x-1/4 -translate-y-1/4
   `,
   AuthorName: twsc.p`
     text-xl sm:text-2xl font-bold tracking-tighter
@@ -120,9 +114,23 @@ export default function QuoteComponent({ quote }: QuoteProps) {
     <styles.AuthorInfoContainer>
       <div className="flex">
         <a href={author?.link}>
-          <styles.AuthorImage
-            $loaded={authorImage !== null}
-            src={authorImage ?? ""} />
+          <div className={tw(
+            "w-16 h-16 aspect-square",
+            "rounded-full overflow-hidden",
+            "-translate-x-1/4 -translate-y-1/4",
+            "border-4 border-secondary-700",
+            "hover:scale-[113.6%]",
+            "transition-all ease-out",
+            "bg-gradient-to-tr from-secondary-300 to-secondary-50",
+            "group",
+            authorImage === null ? "animate-pulse" : "",
+          )}>
+            {
+              authorImage &&
+              <styles.AuthorImage
+                style={{ backgroundImage: `url(${authorImage})` }} />
+            }
+          </div>
         </a>
         <styles.AuthorName>{author?.name}</styles.AuthorName>
       </div>
@@ -145,6 +153,5 @@ export default function QuoteComponent({ quote }: QuoteProps) {
         <styles.SelectionIndicator $which="b" />
       </styles.QuoteBox>
     </styles.QuoteContainer>
-
   </styles.OuterContainer> )
 }

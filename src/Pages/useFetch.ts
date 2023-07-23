@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 export default function useFetch<T>(url: string, queries: { [key: string]: string } = {}) {
   const [result, setResult] = useState<T | null>(null);
 
-  const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "loading" | "error">();
 
   useEffect(() => {
     if(!url) return;
