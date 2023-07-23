@@ -7,7 +7,7 @@ export default function MainLayout() {
   return (
     <>
       <Header />
-      <main className="flex-auto max-w-[56rem] w-[calc(100%-4rem)] self-center py-4">
+      <main className="flex-auto max-w-[56rem] w-[calc(100%-3rem)] sm:w-[calc(100%-4rem)] self-center py-4 transition-all">
         <Outlet />
       </main>
       <Footer />

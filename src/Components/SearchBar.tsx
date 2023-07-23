@@ -38,7 +38,7 @@ const styles = {
     focus:bg-primary-300
     text-tertiary-800
     font-semibold
-    animate-fadeIn
+    animate-fadeSlideIn
     truncate overflow-ellipsis
     flex justify-between
   `

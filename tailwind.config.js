@@ -19,17 +19,27 @@ export default {
 			},
 
 			keyframes: {
-				fadeIn: {
+				fadeSlideIn: {
 					'0%': { transform: 'translateY(10px)', opacity: '0' },
 					'100%': { transform: 'translateY(0px)', opacity: '1' }
 				},
-				fadeOut: {
+				fadeSlideOut: {
 					'0%': { transform: 'translateY(0px)', opacity: '1' },
 					'100%': { transform: 'translateY(10px)', opacity: '0' }
+				},
+				fadeIn: {
+					'0%': { opacity: '0' },
+					'100%': { opacity: '1' }
+				},
+				fadeOut: {
+					'0%': { opacity: '1' },
+					'100%': { opacity: '0' }
 				}
 			},
 
 			animation: {
+				'fadeSlideIn': 'fadeIn forwards 0.5s',
+				'fadeSlideOut': 'fadeOut forwards 0.5s',
 				'fadeIn': 'fadeIn forwards 0.5s',
 				'fadeOut': 'fadeOut forwards 0.5s'
 			},

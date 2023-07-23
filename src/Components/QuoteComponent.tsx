@@ -17,12 +17,17 @@ const styles = {
   AuthorInfoContainer: twsc.div`
     flex flex-col
   `,
-  AuthorImage: twsc.img`
+  AuthorImage: twsc.img<{ $loaded: boolean }>`
+    ${img => img.$loaded ? tw(
+      "animate-fadeIn animation-delay-150"
+    ) : tw(
+      "animate-pulse"
+    )}
     w-16 h-16 aspect-square rounded-full
     object-cover object-top
     border-4 border-secondary-700
     hover:scale-110
-    bg-gradient-to-tr from-tertiary-50 to-tertiary-200
+    bg-gradient-to-tr from-secondary-200 to-secondary-50
     ease-out transition-all
     -translate-x-1/4 -translate-y-1/4
   `,
@@ -44,13 +49,15 @@ const styles = {
     group/quote-container
   `,
   QuoteBox: twsc.button`
-    flex justify-between items-center px-2
+    flex items-center sm:px-8 px-2
+    md:text-start md:justify-start text-center justify-center
     py-4
     border-b-2
     relative
     select-none
     cursor-pointer
     hover:bg-secondary-100
+    transition-all
   `,
   SelectionIndicator: twsc.div<{ $which: "a" | "b" }>`
     absolute right-0
@@ -104,7 +111,7 @@ export default function QuoteComponent({ quote }: QuoteProps) {
       const response = await fetch(`/wiki/w/api.php?action=query&titles=${wikiTitle}&prop=pageimages&format=json&pithumbsize=128`);
       const data = await response.json();
       const page = Object.values(data.query.pages)[0] as any;
-      setAuthorImage(page.thumbnail?.source ?? null);
+      setAuthorImage(page.thumbnail?.source ?? "/src/assets/person.svg");
     })();
   });
 
@@ -112,12 +119,20 @@ export default function QuoteComponent({ quote }: QuoteProps) {
 
     <styles.AuthorInfoContainer>
       <div className="flex">
-        <styles.AuthorImage src={authorImage ?? "/src/assets/person.svg"} />
+        <a href={author?.link}>
+          <styles.AuthorImage
+            $loaded={authorImage !== null}
+            src={authorImage ?? ""} />
+        </a>
         <styles.AuthorName>{author?.name}</styles.AuthorName>
       </div>
-      <styles.AuthorBio>
-        {author?.bio}
-      </styles.AuthorBio>
+      {
+        author ? 
+        <styles.AuthorBio>
+          {author?.bio}
+        </styles.AuthorBio>
+        : <p className="text-center animate-pulse text-secondary-800">&bull; &bull; &bull;</p>
+      }
     </styles.AuthorInfoContainer>
 
     <styles.QuoteContainer>

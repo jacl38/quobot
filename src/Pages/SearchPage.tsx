@@ -22,14 +22,14 @@ export default function SearchPage() {
     <Styled.PageTitle>Search for a quote tag</Styled.PageTitle>
 
     {tags.status === "idle" && tags.result?.length && <>
-      <Styled.Paragraph className="indent-0 text-center animate-fadeIn my-4">
+      <Styled.Paragraph className="indent-0 text-center animate-fadeSlideIn my-4">
         Try searching for {suggestions.map((tag, i) => {
           if(i === 2) return `or ${tag}`;
           return `${tag}, `;
         }).join("")}
       </Styled.Paragraph>
       
-      <section className="flex flex-col items-center opacity-0 animation-delay-300 animate-fadeIn">
+      <section className="flex flex-col items-center opacity-0 animation-delay-300 animate-fadeSlideIn">
         <SearchBar
           resultPrefix="tag"
           search={tagSearch.term}

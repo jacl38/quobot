@@ -17,7 +17,7 @@ export default function TagPage() {
       {tag.status === "loading" && <p className="opacity-50 text-center">Loading...</p>}
 
       {tag.status === "idle" && (tag.result?.quotes.length ? <>
-        <section className="animate-fadeIn">
+        <section className="animate-fadeSlideIn">
           <Styled.PageTitle>{tag.result?.tag.name}</Styled.PageTitle>
           <Styled.Paragraph className="text-center indent-0">{tag.result?.tag.quoteCount} quotes</Styled.Paragraph>
 
