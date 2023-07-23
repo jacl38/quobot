@@ -31,6 +31,8 @@ app.get("/api/search/author", async (req, res) => {
   res.send(authors);
 });
 
+// example usage:
+// /api/search/tag?slug=inspir => [{ name: "Inspiration", slug: "inspiration", quoteCount: 1234 }, ...]
 app.get("/api/search/tag", async (req, res) => {
   const slug = req.query.slug as string;
   const tags = await getTags();
@@ -38,10 +40,18 @@ app.get("/api/search/tag", async (req, res) => {
   res.send(results.map((r) => r.obj));
 });
 
-app.get("/api/tag/:id", async (req, res) => {
-  const { id } = req.params as { id: string };
-  const author = await findAuthorBySlug(id);
-  res.send(author);
+// sends all tags with more than 5 quotes
+app.get("/api/tags", async (req, res) => {
+  const tags = await getTags();
+  res.send(tags);
+});
+
+// example usage:
+// /api/tag/inspiration => { tag: { name: "Inspiration", slug: "inspiration", quoteCount: 1234 }, results: [{ ... }, ...] }
+app.get("/api/tag/:slug", async (req, res) => {
+  const slug = req.params.slug;
+  const results = await findQuotesByTagSlug(slug);
+  res.send(results);
 });
 
 app.listen(3000, () => {

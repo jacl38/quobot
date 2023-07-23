@@ -39,9 +39,12 @@ export async function getTags(): Promise<Tag[]> {
 }
 
 /** Uses the Quotable API to return a list of quotes from the supplied tag slug */
-export async function findQuotesByTagSlug(slug: string): Promise<Quote[]> {
+export async function findQuotesByTagSlug(slug: string): Promise<{ tag: Tag, quotes: Quote[] }> {
   const url = `${baseURL}/quotes/random?limit=50&tags=${slug}`;
   const response = await fetch(url);
   const body = await response.json();
-  return body.results;
+  const allTags = await getTags();
+  const thisTag = allTags.find(tag => tag.slug === slug);
+
+  return { tag: thisTag!, quotes: body };
 }
