@@ -4,13 +4,11 @@ import Styled from "../Components/styled";
 import useFetch from "./useFetch";
 import QuoteComponent from "../Components/QuoteComponent";
 import { useState } from "react";
+import { clamp } from "../Utility/mathUtil";
 
 export default function TagPage() {
   const { id } = useParams()
   const tag = useFetch<{ tag: Tag, quotes: Quote[] }>(`/api/tag/${id}`);
-
-  console.log(tag.result);
-
   const [limit, setLimit] = useState(0);
 
   return (
@@ -27,7 +25,7 @@ export default function TagPage() {
             if(i < limit) return <QuoteComponent key={quote._id} quote={quote} />
             return null;
           })}
-          <button onClick={() => setLimit(lim => lim + 1)}>+1</button>
+          <button onClick={() => setLimit(lim => clamp(lim + 1, 0, tag.result?.tag!.quoteCount))}>+1</button>
         </section>
       </> : <>
           <Styled.PageTitle>Tag not found</Styled.PageTitle>
