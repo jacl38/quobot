@@ -7,7 +7,7 @@ export default function MainLayout() {
   return (
     <>
       <Header />
-      <main className="flex-auto h-full max-w-[56rem] w-full self-center py-4">
+      <main className="flex-auto max-w-[56rem] w-full self-center py-4">
         <Outlet />
       </main>
       <Footer />
