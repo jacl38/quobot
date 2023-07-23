@@ -3,17 +3,13 @@ import "./index.css";
 import Header from "./Components/Header";
 import Footer from "./Components/Footer";
 
-const styles = {
-
-}
-
 export default function MainLayout() {
   return (
     <>
       <Header />
-      <div className="flex-auto h-full">
+      <main className="flex-auto h-full max-w-[56rem] w-full self-center py-4">
         <Outlet />
-      </div>
+      </main>
       <Footer />
     </>
   )
