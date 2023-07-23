@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  *.has-link a, a.has-link {
+    text-decoration: underline;
+    font-weight: 600;
+  }
+}
