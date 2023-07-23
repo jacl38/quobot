@@ -20,3 +20,12 @@ export type Author = {
   dateAdded: string,
   dateModified: string
 }
+
+export type Tag = {
+  _id: string,
+  name: string,
+  slug: string
+  quoteCount: number,
+  dateAdded: string,
+  dateModified: string
+}
