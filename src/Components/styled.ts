@@ -24,7 +24,7 @@ const linkClassNames = tw(`
 const PageTitle = twsc.h2`
   text-3xl font-semibold
   text-center
-  text-tertiary-700
+  text-neutral-800
 `
 
 const Paragraph = twsc.p`

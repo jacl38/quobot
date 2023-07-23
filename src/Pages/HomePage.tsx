@@ -12,6 +12,5 @@ export default function HomePage() {
     <div className="flex justify-center">
       <Link className={Styled.linkClassNames} to="/search">Let's Begin</Link>
     </div>
-
   </>)
 }
