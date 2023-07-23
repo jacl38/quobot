@@ -9,3 +9,4 @@
 
 [ ] 404 Page (path="*")
 [ ] GPT backend
+[ ] Fix crashes on API timeout

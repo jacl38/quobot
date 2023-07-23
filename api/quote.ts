@@ -1,5 +1,6 @@
 import fetch from "node-fetch";
 import { Author, Quote, Tag } from "./types/quote";
+import { findImageUrlByTitle, titleFromURL } from "./wiki";
 
 const baseURL = "https://api.quotable.io";
 
@@ -16,9 +17,9 @@ export async function findAuthorBySlug(slug: string): Promise<Author> {
   const url = `${baseURL}/authors?slug=${slug}`;
   const response = await fetch(url);
   const body = await response.json();
-  return body;
+  const foundAuthor = body.results[0] as Author;
+  return foundAuthor;
 }
-
 
 /** Uses the Quotable API to return a list of (at most 50) quotes from the supplied author ID */
 export async function findQuotesByAuthorID(id: string): Promise<Quote[]> {

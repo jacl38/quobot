@@ -10,6 +10,11 @@ export default defineConfig({
         target: 'http://localhost:3000',
         changeOrigin: true,
       },
+      "/wiki": {
+        target: "https://en.wikipedia.org",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/wiki/, "")
+      }
     },
   },
 });

@@ -12,17 +12,17 @@ export async function findTitleBySearch(title: string): Promise<string | null> {
   return firstResult ? firstResult.title : null;
 }
 
-/** Uses the Wikipedia API to find the "pageimage" URL at a size of 500 from the supplied `title` */
-export async function findImageUrlByTitle(title: string): Promise<string | null> {
-  const url = `${baseURL}?action=query&titles=${title}&prop=pageimages&format=json&pithumbsize=500`;
+/** Uses the Wikipedia API to find the "pageimage" URL at a size of 300px from the supplied `title` */
+export async function findImageUrlByTitle(title: string): Promise<string | undefined> {
+  const url = `${baseURL}?action=query&titles=${title}&prop=pageimages&format=json&pithumbsize=300`;
   const response = await fetch(url);
   const body = await response.json();
   const page = Object.values(body.query.pages)[0] as any;
-  return page.thumbnail ? page.thumbnail.source : null;
+  return page.thumbnail ? page.thumbnail.source : undefined;
 }
 
 /** Returns the full title of a page, given its `url`. */
-export function TitleFromURL(url: string): string {
+export function titleFromURL(url: string): string {
   const parts = url.split("/");
   return parts[parts.length - 1];
 }
