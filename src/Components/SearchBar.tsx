@@ -1,10 +1,13 @@
 import tw from "tailwind-styled-components"
-import { Author } from "../types/quote";
+import { Author, Tag } from "../types/quote";
+import { Link } from "react-router-dom";
+import { useEffect } from "react";
 
 type SearchBarProps = {
   search: string,
   searchResults: any[],
   setSearch: (search: string) => void,
+  resultPrefix: string
 }
 
 const styles = {
@@ -29,7 +32,7 @@ const styles = {
   ResultsContainer: tw.div`
     flex flex-col
   `,
-  Result: tw.a`
+  result: `
     px-4 pb-2
     focus:outline-none
     focus:bg-primary-300
@@ -41,7 +44,8 @@ const styles = {
   `
 }
 
-export default function SearchBar({ search, searchResults, setSearch }: SearchBarProps) {
+export default function SearchBar({ search, searchResults, setSearch, resultPrefix }: SearchBarProps) {
+
   return (
     <>
       <styles.OuterContainer>
@@ -50,21 +54,18 @@ export default function SearchBar({ search, searchResults, setSearch }: SearchBa
           type="text"
           placeholder="Search..."
           value={search}
-          onKeyDown={e => {
-            console.log(e.key);
-            if(e.key === "ArrowDown") {
-
-            }
-          }}
           onChange={e => setSearch(e.target.value)} />
 
         <styles.ResultsContainer>
-          {searchResults.map((result: Author) => (<>
-            <styles.Result href={`/author/${result.slug}`}>
-              <span>{result.name}</span>
-              <span>{result.quoteCount}</span>
-            </styles.Result>
-          </>))}
+          {searchResults.map((result: Tag) => (
+            <Link
+              key={result._id}
+              className={styles.result}
+              to={`/${resultPrefix}/${result.slug}`}>
+              <span key={`${result._id}-name`}>{result.name}</span>
+              <span key={`${result._id}-count`}>{result.quoteCount}</span>
+            </Link>
+          ))}
         </styles.ResultsContainer>
 
       </styles.OuterContainer>

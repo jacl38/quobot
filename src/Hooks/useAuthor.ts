@@ -9,7 +9,7 @@ export default function useAuthor(id: string) {
       const url = `/api/author/${id}`;
       const response = await fetch(url);
       const body = await response.json();
-      setResult(body);
+      setResult(body.results[0]);
     })();
   }, [id]);
 

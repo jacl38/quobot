@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { Author } from "../types/quote";
+import { Tag } from "../types/quote";
 
-export default function useAuthorSearch() {
+export default function useTagSearch() {
   const [term, setTerm] = useState("");
-  const [results, setResults] = useState<Author[]>([]);
+  const [results, setResults] = useState<Tag[]>([]);
 
   useEffect(() => {
     if (!term) {
@@ -11,7 +11,7 @@ export default function useAuthorSearch() {
       return;
     }
     (async () => {
-      const url = `/api/search/author?name=${term}`;
+      const url = `/api/search/tag?slug=${term}`;
       const response = await fetch(url);
       const body = await response.json();
       setResults(body);
