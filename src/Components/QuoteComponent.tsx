@@ -4,6 +4,7 @@ import useAuthor from "../Hooks/useAuthor"
 import { Author, Quote } from "../types/quote"
 import { useEffect, useState } from "react"
 import { seededRNG } from "../Utility/mathUtil"
+import QuoteAnswer from "./QuoteAnswer"
 
 type QuoteProps = {
   quotes: { _id: string, content: string }[],
@@ -64,9 +65,9 @@ const styles = {
   `,
   SelectionIndicator: twsc.div<{ $which: "a" | "b", $answer: "a" | "b" | undefined }>`
     absolute right-0
-  bg-secondary-100
+    bg-secondary-100
     border-2 border-secondary-700
-  group-hover/quote-container:bg-red-500
+    group-hover/quote-container:bg-red-500
     group-hover/quote-container:scale-150
     group-hover/quote-container:my-2
     group-hover/quote-container:font-mono
@@ -183,29 +184,25 @@ export default function QuoteComponent({ quotes, author, onSelection, seed }: Qu
 
     <styles.QuoteContainer>
 
-      <styles.QuoteBox
-        $correct={isCorrect("a")}
-        onClick={() => {
-        setSelected("a");
-        onSelection(quotes[Math.round(rng)]._id)
-      }} className="group/quote-a">
-        "{quotes[Math.round(rng)].content}"
-        <styles.SelectionIndicator
-          $which="a"
-          $answer={selected} />
-      </styles.QuoteBox>
+      <QuoteAnswer
+        which="a"
+        onSelect={() => {
+          setSelected("a");
+          onSelection(quotes[Math.round(rng)]._id)
+        }}
+        quote={quotes[0].content}
+        correct={selected !== "a" && !isCorrect("a") ? undefined : isCorrect("a")}
+      />
 
-      <styles.QuoteBox
-        $correct={isCorrect("b")}
-        onClick={() => {
-        setSelected("b");
-        onSelection(quotes[1 - Math.round(rng)]._id)
-      }} className="group/quote-b">
-        "{quotes[1 - Math.round(rng)].content}"
-        <styles.SelectionIndicator
-          $which="b"
-          $answer={selected} />
-      </styles.QuoteBox>
+      <QuoteAnswer
+        which="b"
+        onSelect={() => {
+          setSelected("b");
+          onSelection(quotes[1]._id)
+        }}
+        quote={quotes[1].content}
+        correct={selected !== "b" && !isCorrect("b") ? undefined : isCorrect("b")}
+      />
 
     </styles.QuoteContainer>
   </styles.OuterContainer> )

@@ -5,7 +5,7 @@ import useFetch from "./useFetch";
 import QuoteComponent from "../Components/QuoteComponent";
 import { useEffect, useState } from "react";
 import { clamp, seededRNG, shuffle } from "../Utility/mathUtil";
-import QuoteAnswerComponent from "../Components/QuoteAnswerComponent";
+import QuoteAnswer from "../Components/QuoteAnswer";
 
 type QuoteResponse = {
   author: Author,
