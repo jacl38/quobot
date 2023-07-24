@@ -38,8 +38,8 @@ export default {
 			},
 
 			animation: {
-				'fadeSlideIn': 'fadeIn forwards 0.5s',
-				'fadeSlideOut': 'fadeOut forwards 0.5s',
+				'fadeSlideIn': 'fadeSlideIn forwards 0.5s',
+				'fadeSlideOut': 'fadeSlideOut forwards 0.5s',
 				'fadeIn': 'fadeIn forwards 0.5s',
 				'fadeOut': 'fadeOut forwards 0.5s'
 			},

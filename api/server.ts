@@ -49,19 +49,25 @@ app.get("/api/tags", async (req, res) => {
   res.send(tags);
 });
 
-// example usage:
-// /api/tag/inspiration => { tag: { name: "Inspiration", slug: "inspiration", quoteCount: 1234 }, results: [{ ... }, ...] }
-// app.get("/api/tag/:slug", async (req, res) => {
-//   const slug = req.params.slug;
-//   const results = await findQuotesByTagSlug(slug);
+// example usage
+// /api/tag/inspiration => { tag: { name: "Inspiration", slug: "inspiration", quoteCount: 1234 } }
+app.get("/api/tag/:slug", async (req, res) => {
+  const slug = req.params.slug;
+  const allTags = await getTags();
 
-//   res.send(results);
-// });
+  const thisTag = allTags.find(tag => tag.slug === slug);
+  if(!thisTag) {
+    res.status(404).send({ error: "Tag not found." });
+    res.end();
+    return;
+  }
+
+  res.send(thisTag);
+});
 
 // the supplied req.body is a list of quote IDs that have already been used
 // will return a random quote that has not been used yet by checking the IDs
-app.post("/api/tag/:slug", async (req, res) => {
-  console.log(req.body);
+app.post("/api/quotes/:slug", async (req, res) => {
   if(req.body === undefined) {
     res.status(400).send({ error: "No body supplied." });
     res.end();

@@ -11,13 +11,11 @@ export default async function getAlternateQuote(quote: string): Promise<string> 
 
   if(!OPENAI_API_KEY) throw new Error("No OpenAI API key found in .env file");
   const prompt = [
-    "Here is a famous quote.",
-    "Rewrite this quote in an alternate way.",
-    "Do not make the quote simpler or more complex, and do not paraphrase.",
-    "Keep the meaning and the tone of the quote the same.",
+    "Change the wording of part of this quote just a little.",
+    "Keep the meaning and most of the words the same.",
     "ONLY output the new quote, nothing else.",
-    `"${quote}"`
-  ].join("\n");
+    `"\n${quote}"`
+  ].join(" ");
 
   // make post request
 

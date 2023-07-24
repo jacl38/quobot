@@ -3,9 +3,13 @@ import { tw } from "./styled"
 import useAuthor from "../Hooks/useAuthor"
 import { Author, Quote } from "../types/quote"
 import { useEffect, useState } from "react"
+import { seededRNG } from "../Utility/mathUtil"
 
 type QuoteProps = {
-  quote: Quote
+  quotes: { _id: string, content: string }[],
+  author: Author,
+  onSelection: (id: string) => void,
+  seed: number
 }
 
 const styles = {
@@ -42,7 +46,7 @@ const styles = {
     flex flex-col
     group/quote-container
   `,
-  QuoteBox: twsc.button`
+  QuoteBox: twsc.button<{ $correct: boolean | undefined }>`
     flex items-center sm:px-8 px-2
     md:text-start md:justify-start text-center justify-center
     py-4
@@ -52,8 +56,13 @@ const styles = {
     cursor-pointer
     hover:bg-secondary-100
     transition-all
+    ${p => {
+      if(p.$correct) return "bg-green-200 font-semibold";
+      if(p.$correct === false) return "bg-red-200 line-through";
+      return "bg-initial";
+    }}
   `,
-  SelectionIndicator: twsc.div<{ $which: "a" | "b" }>`
+  SelectionIndicator: twsc.div<{ $which: "a" | "b", $answer: "a" | "b" | undefined }>`
     absolute right-0
   bg-secondary-100
     border-2 border-secondary-700
@@ -63,25 +72,47 @@ const styles = {
     group-hover/quote-container:font-mono
     group-hover/quote-container:rounded-2xl
     translate-x-3/4
-  group-hover/quote-container:after:text-red-200
+    group-hover/quote-container:after:text-red-200
     group-hover/quote-container:border-red-600
-    ${p => p.$which === "a"
-      ? tw(
-        "group-hover/quote-a:!bg-green-500",
-        "group-hover/quote-a:after:!content-['✔'] group-hover/quote-a:after:!text-green-100",
-        "group-hover/quote-a:!border-green-600",
-        "group-hover/quote-a:!rounded-lg",
-        "group-hover/quote-a:scale-[180%]",
-        "group-hover/quote-container:after:content-['✖']",
-      ): tw(
-        "group-hover/quote-b:!bg-green-500",
-        "group-hover/quote-b:after:!content-['✔'] group-hover/quote-b:after:!text-green-100",
-        "group-hover/quote-b:!border-green-600",
-        "group-hover/quote-b:!rounded-lg",
-        "group-hover/quote-b:scale-[180%]",
-        "group-hover/quote-container:after:content-['✖']",
-      )
+    ${p => {
+      if(p.$answer !== undefined) {
+        if(p.$answer === p.$which) return tw( // answer is correct
+          "!bg-green-500",
+          "after:!content-['✔'] after:!text-green-100",
+          "!border-green-600",
+          "!rounded-lg",
+          "!scale-[180%]",
+          "!font-mono"
+          );
+          else return tw( // answer is incorrect
+          "!bg-red-500",
+          "after:!content-['✖'] after:!text-red-100",
+          "!border-red-600",
+          "!rounded-2xl",
+          "!font-mono"
+        );
+      }
+
+      // no answer so far
+      return p.$which === "a"
+        ? tw(
+          "group-hover/quote-a:!bg-green-500",
+          "group-hover/quote-a:after:!content-['✔'] group-hover/quote-a:after:!text-green-100",
+          "group-hover/quote-a:!border-green-600",
+          "group-hover/quote-a:!rounded-lg",
+          "group-hover/quote-a:scale-[180%]",
+          "group-hover/quote-container:after:content-['✖']",
+        ): tw(
+          "group-hover/quote-b:!bg-green-500",
+          "group-hover/quote-b:after:!content-['✔'] group-hover/quote-b:after:!text-green-100",
+          "group-hover/quote-b:!border-green-600",
+          "group-hover/quote-b:!rounded-lg",
+          "group-hover/quote-b:scale-[180%]",
+          "group-hover/quote-container:after:content-['✖']",
+        )
+      }
     }
+
     rounded-md
     after:content-['?']
     flex items-center justify-center
@@ -93,9 +124,16 @@ const styles = {
   `
 }
 
-export default function QuoteComponent({ quote }: QuoteProps) {
-  const author = useAuthor(quote.authorSlug);
+export default function QuoteComponent({ quotes, author, onSelection, seed }: QuoteProps) {
   const [authorImage, setAuthorImage] = useState<string | null>(null);
+  const rng = seededRNG(seed)();
+
+  const [selected, setSelected] = useState<"a" | "b" | undefined>(undefined);
+
+  function isCorrect(which: "a" | "b") {
+    if(selected === undefined) return undefined;
+    return Math.round(rng) === (which === "a" ? 0 : 1);
+  }
 
   useEffect(() => {
     if(authorImage) return;
@@ -107,14 +145,14 @@ export default function QuoteComponent({ quote }: QuoteProps) {
       const page = Object.values(data.query.pages)[0] as any;
       setAuthorImage(page.thumbnail?.source ?? "/src/assets/person.svg");
     })();
-  });
+  }, [author]);
 
-  return ( <styles.OuterContainer key={quote._id}>
+  return ( <styles.OuterContainer key={quotes.sort()[0]._id + quotes.sort()[1]._id}>
 
-    <styles.AuthorInfoContainer>
-      <div className="flex">
-        <a href={author?.link}>
-          <div className={tw(
+    <styles.AuthorInfoContainer key="author-info">
+      <div className="flex" key="author-info-box">
+        <a href={author?.link} key="author-info-link">
+          <div key="author-image-background" className={tw(
             "w-16 h-16 aspect-square",
             "rounded-full overflow-hidden",
             "-translate-x-1/4 -translate-y-1/4",
@@ -127,16 +165,16 @@ export default function QuoteComponent({ quote }: QuoteProps) {
           )}>
             {
               authorImage &&
-              <styles.AuthorImage
+              <styles.AuthorImage key="author-image"
                 style={{ backgroundImage: `url(${authorImage})` }} />
             }
           </div>
         </a>
-        <styles.AuthorName>{author?.name}</styles.AuthorName>
+        <styles.AuthorName key="author-name">{author?.name}</styles.AuthorName>
       </div>
       {
         author ? 
-        <styles.AuthorBio>
+        <styles.AuthorBio key="author-bio">
           {author?.bio}
         </styles.AuthorBio>
         : <p className="text-center animate-pulse text-secondary-800">&bull; &bull; &bull;</p>
@@ -144,14 +182,31 @@ export default function QuoteComponent({ quote }: QuoteProps) {
     </styles.AuthorInfoContainer>
 
     <styles.QuoteContainer>
-      <styles.QuoteBox className="group/quote-a">
-        "{quote.content}"
-        <styles.SelectionIndicator $which="a" />
+
+      <styles.QuoteBox
+        $correct={isCorrect("a")}
+        onClick={() => {
+        setSelected("a");
+        onSelection(quotes[Math.round(rng)]._id)
+      }} className="group/quote-a">
+        "{quotes[Math.round(rng)].content}"
+        <styles.SelectionIndicator
+          $which="a"
+          $answer={selected} />
       </styles.QuoteBox>
-      <styles.QuoteBox className="group/quote-b">
-        "{quote.content}"
-        <styles.SelectionIndicator $which="b" />
+
+      <styles.QuoteBox
+        $correct={isCorrect("b")}
+        onClick={() => {
+        setSelected("b");
+        onSelection(quotes[1 - Math.round(rng)]._id)
+      }} className="group/quote-b">
+        "{quotes[1 - Math.round(rng)].content}"
+        <styles.SelectionIndicator
+          $which="b"
+          $answer={selected} />
       </styles.QuoteBox>
+
     </styles.QuoteContainer>
   </styles.OuterContainer> )
 }
