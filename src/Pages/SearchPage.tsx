@@ -8,7 +8,7 @@ import useFetch from "./useFetch";
 
 export default function SearchPage() {
 
-  const tags = useFetch<Tag[]>("/api/tags");
+  const tags = useFetch<Tag[]>({ url: "/api/tags" });
   const tagSearch = useTagSearch();
   
   const [suggestions, setSuggestions] = useState<string[]>([]);
