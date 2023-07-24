@@ -6,7 +6,8 @@ type QuoteAnswerComponentProps = {
   which: "a" | "b",
   correct?: boolean,
   onSelect?: () => void,
-  selected?: boolean
+  selected?: boolean,
+  hasAnswered: boolean
 }
 
 const styles = {
@@ -14,7 +15,7 @@ const styles = {
     flex items-center
     sm:px-8 px-2 py-2
     md:text-start md:justify-start text-center justify-center
-    border-b-2
+    first-of-type:border-b-2
     relative
     select-none cursor-default
     transition-all
@@ -22,17 +23,18 @@ const styles = {
       if(p.$highlight === "none") return "bg-white";
       if(p.$highlight === "red") return "bg-red-200 line-through";
       if(p.$highlight === "green") return "bg-green-200 font-semibold";
-      return "hover:bg-secondary-100 cursor-pointer";
+      return "enabled:hover:bg-secondary-100 enabled:cursor-pointer";
     }}
   `
 }
 
-export default function QuoteAnswer({ quote, correct, which, onSelect }: QuoteAnswerComponentProps) {
+export default function QuoteAnswer({ quote, correct, which, onSelect, hasAnswered }: QuoteAnswerComponentProps) {
   const highlight = correct === undefined ? "regular" : correct ? "green" : "red";
 
   return (
     <styles.OuterContainer
       onClick={onSelect}
+      disabled={hasAnswered}
       className={which === "a" ? "group/a" : "group/b"}
       $highlight={highlight}>
       <p>{quote}</p>

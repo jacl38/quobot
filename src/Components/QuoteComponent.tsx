@@ -1,6 +1,5 @@
 import twsc from "tailwind-styled-components"
 import { tw } from "./styled"
-import useAuthor from "../Hooks/useAuthor"
 import { Author, Quote } from "../types/quote"
 import { useEffect, useState } from "react"
 import { seededRNG } from "../Utility/mathUtil"
@@ -188,9 +187,10 @@ export default function QuoteComponent({ quotes, author, onSelection, seed }: Qu
         which="a"
         onSelect={() => {
           setSelected("a");
-          onSelection(quotes[Math.round(rng)]._id)
+          onSelection(quotes[Math.round(rng)]._id);
         }}
-        quote={quotes[0].content}
+        quote={quotes[Math.round(rng)].content}
+        hasAnswered={selected !== undefined}
         correct={selected !== "a" && !isCorrect("a") ? undefined : isCorrect("a")}
       />
 
@@ -198,9 +198,10 @@ export default function QuoteComponent({ quotes, author, onSelection, seed }: Qu
         which="b"
         onSelect={() => {
           setSelected("b");
-          onSelection(quotes[1]._id)
+          onSelection(quotes[1 - Math.round(rng)]._id);
         }}
-        quote={quotes[1].content}
+        quote={quotes[1 - Math.round(rng)].content}
+        hasAnswered={selected !== undefined}
         correct={selected !== "b" && !isCorrect("b") ? undefined : isCorrect("b")}
       />
 

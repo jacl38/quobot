@@ -1,11 +1,10 @@
 import { Link, useParams } from "react-router-dom";
 import { Author, Quote, Tag } from "../types/quote";
 import Styled, { tw } from "../Components/styled";
-import useFetch from "./useFetch";
+import twsc from "tailwind-styled-components";
 import QuoteComponent from "../Components/QuoteComponent";
 import { useEffect, useState } from "react";
-import { clamp, seededRNG, shuffle } from "../Utility/mathUtil";
-import QuoteAnswer from "../Components/QuoteAnswer";
+import styled from "../Components/styled";
 
 type QuoteResponse = {
   author: Author,
@@ -13,6 +12,19 @@ type QuoteResponse = {
     _id: string,
     content: string
   }[]
+}
+
+const styles = {
+  Scorebox: twsc.div`
+    bg-primary-200 text-primary-800
+    font-black tracking-tighter text-2xl
+    py-1 px-2
+    rounded-lg
+    basis-full
+    text-center
+    hover:scale-110
+    transition-all ease-out-back
+  `
 }
 
 export default function TagPage() {
@@ -99,12 +111,39 @@ export default function TagPage() {
         key={q.quotes[0]._id+q.quotes[1]._id} />
     })}
 
-    {quoteStatus === "error" && hitLimit && <>
-      <Styled.Paragraph className="text-center animate-fadeSlideIn">
+    {quoteStatus === "error" && hitLimit && <div className="flex flex-col items-center space-y-4">
+      <Styled.Paragraph className="text-center animate-fadeSlideIn indent-0">
         You've reached the end of this tag's quotes!
       </Styled.Paragraph>
-    </>}
+
+      <Link to="/search" className={tw(
+        styled.linkClassNames,
+        "animate-fadeSlideIn animation-delay-300"
+        )}>
+        Search for another tag
+      </Link>
+    </div>}
 
     {quoteStatus === "loading" && <p className="text-2xl text-neutral-500 text-center animate-pulse">&bull; &bull; &bull;</p>}
+
+    {
+      tagStatus === "good" && (
+        <div className="mb-24 mt-20 flex items-center justify-center opacity-0 animate-fadeSlideIn animation-delay-500">
+          <div className="border-8 border-black py-4 px-4 rounded-tr-xl rounded-bl-xl rounded-tl-3xl rounded-br-3xl">
+            <h3 className="text-2xl text-center font-bold tracking-tighter">Scoreboard</h3>
+            <div className="grid grid-cols-2 gap-x-4 rounded mt-4">
+              <styles.Scorebox>
+                <p>Total</p>
+                {answers.filter(a => a).length} / {answers.length}
+              </styles.Scorebox>
+              <styles.Scorebox>
+                <p>Accuracy</p>
+                {answers.length ? Math.round(answers.filter(a => a).length / answers.length * 100) : 0}%
+              </styles.Scorebox>
+            </div>
+          </div>
+        </div>
+      )
+    }
   </>);
 }
