@@ -5,9 +5,17 @@ const { OPENAI_API_KEY } = process.env;
 
 const perDay = 2000;
 let usedToday = 0;
+let today = new Date().getDay();
 
 export default async function getAlternateQuote(quote: string): Promise<string> {
-  if(usedToday >= perDay) throw new Error("OpenAI API limit reached for today");
+  if(usedToday >= perDay) {
+    if(today !== new Date().getDay()) {
+      usedToday = 0;
+      today = new Date().getDay();
+    } else {
+      throw new Error("OpenAI API limit reached for today");
+    }
+  }
 
   if(!OPENAI_API_KEY) throw new Error("No OpenAI API key found in .env file");
   const prompt = [

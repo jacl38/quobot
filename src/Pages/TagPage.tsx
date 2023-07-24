@@ -39,6 +39,7 @@ export default function TagPage() {
   const [answers, setAnswers] = useState<(boolean | undefined)[]>([]);
 
   const [quoteStatus, setQuoteStatus] = useState<"loading" | "error" | "good">("good");
+  const [noMoreQuotes, setNoMoreQuotes] = useState(false);
   const [hitLimit, setHitLimit] = useState(false);
 
   useEffect(() => {
@@ -69,7 +70,14 @@ export default function TagPage() {
     });
     if(request.status === 204) {
       setQuoteStatus("error");
+      setNoMoreQuotes(true);
+    }
+    if(request.status === 429) {
+      setQuoteStatus("error");
       setHitLimit(true);
+    }
+    if(request.status === 500) {
+      setQuoteStatus("error");
     }
     const data = await request.json() as QuoteResponse;
     setUsedQuoteIDs([...usedQuoteIDs, data.quotes[0]._id]);
@@ -103,7 +111,7 @@ export default function TagPage() {
           setAnswers(a => [...a, id === q.quotes[0]._id]);
 
           // request another quote
-          if(!hitLimit) getNextQuote();
+          if(!noMoreQuotes) getNextQuote();
           else setQuoteStatus("error");
         }}
         author={q.author}
@@ -112,6 +120,12 @@ export default function TagPage() {
     })}
 
     {quoteStatus === "error" && hitLimit && <div className="flex flex-col items-center space-y-4">
+      <Styled.Paragraph className="text-center animate-fadeSlideIn indent-0">
+        The server has made too many OpenAI requests today. Please try again tomorrow.
+      </Styled.Paragraph>
+    </div>}
+
+    {quoteStatus === "error" && noMoreQuotes && <div className="flex flex-col items-center space-y-4">
       <Styled.Paragraph className="text-center animate-fadeSlideIn indent-0">
         You've reached the end of this tag's quotes!
       </Styled.Paragraph>

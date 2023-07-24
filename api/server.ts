@@ -68,54 +68,64 @@ app.get("/api/tag/:slug", async (req, res) => {
 // the supplied req.body is a list of quote IDs that have already been used
 // will return a random quote that has not been used yet by checking the IDs
 app.post("/api/quotes/:slug", async (req, res) => {
-  if(req.body === undefined) {
-    res.status(400).send({ error: "No body supplied." });
-    res.end();
-    return;
-  }
-  const slug = req.params.slug;
-  const usedIDs = req.body.usedIDs as string[] ?? [];
-
-  let randomQuotes = await findQuotesByTagSlug(slug);
+  try {
+    if(req.body === undefined) {
+      res.status(400).send({ error: "No body supplied." });
+      res.end();
+      return;
+    }
+    const slug = req.params.slug;
+    const usedIDs = req.body.usedIDs as string[] ?? [];
   
-  if(randomQuotes.quotes.length === usedIDs.length) {
-    res.status(204).send({ error: "No more quotes." });
+    let randomQuotes = await findQuotesByTagSlug(slug);
+    
+    if(randomQuotes.quotes.length === usedIDs.length) {
+      res.status(204).send({ error: "No more quotes." });
+      res.end();
+      return;
+    }
+  
+    let foundQuote: Quote | undefined = undefined;
+  
+    for(let i = 0; i < 10; i++) {
+      const unusedQuotes = randomQuotes.quotes.filter(q => !usedIDs.includes(q._id));
+      if(unusedQuotes.length > 0) {
+        const randomQuote = unusedQuotes[0];
+        foundQuote = randomQuote;
+        break;
+      } else {
+        randomQuotes = await findQuotesByTagSlug(slug);
+      }
+    }
+  
+    if(!foundQuote) {
+      res.status(204).send({ error: "No more quotes." });
+      res.end();
+      return;
+    }
+  
+    const newQuote = await getAlternateQuote(foundQuote.content);
+    const author = await findAuthorBySlug(foundQuote.authorSlug);
+  
+    const newID = foundQuote._id.split("").reverse().join("");
+  
+    res.status(200).send({
+      author,
+      quotes: [
+        { _id: foundQuote._id, content: foundQuote.content },
+        { _id: newID, content: newQuote }
+      ]
+    });
     res.end();
-    return;
-  }
-
-  let foundQuote: Quote | undefined = undefined;
-
-  for(let i = 0; i < 10; i++) {
-    const unusedQuotes = randomQuotes.quotes.filter(q => !usedIDs.includes(q._id));
-    if(unusedQuotes.length > 0) {
-      const randomQuote = unusedQuotes[0];
-      foundQuote = randomQuote;
-      break;
+  } catch(e: any) {
+    if(e.message === "OpenAI API limit reached for today") {
+      res.status(429).send({ error: "OpenAI API limit reached for today" });
+      res.end();
     } else {
-      randomQuotes = await findQuotesByTagSlug(slug);
+      res.status(500).send({ error: "Server error." });
+      res.end();
     }
   }
-
-  if(!foundQuote) {
-    res.status(204).send({ error: "No more quotes." });
-    res.end();
-    return;
-  }
-
-  const newQuote = await getAlternateQuote(foundQuote.content);
-  const author = await findAuthorBySlug(foundQuote.authorSlug);
-
-  const newID = foundQuote._id.split("").reverse().join("");
-
-  res.status(200).send({
-    author,
-    quotes: [
-      { _id: foundQuote._id, content: foundQuote.content },
-      { _id: newID, content: newQuote }
-    ]
-  });
-  res.end();
 });
 
 app.listen(3000, () => {
