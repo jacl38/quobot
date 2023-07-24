@@ -2,8 +2,11 @@ import express from "express";
 import { findImageUrlByTitle, findTitleBySearch } from "./wiki";
 import { findAuthorBySlug, findAuthors, findQuotesByTagSlug, getTags } from "./quote";
 import fuzzysort from "fuzzysort";
+import getAlternateQuote from "./gpt";
+import { Quote } from "./types/quote";
 
 const app = express();
+app.use(express.json());
 
 app.get("/api/test", async (req, res) => {
   const query = req.query.q as string;
@@ -48,10 +51,65 @@ app.get("/api/tags", async (req, res) => {
 
 // example usage:
 // /api/tag/inspiration => { tag: { name: "Inspiration", slug: "inspiration", quoteCount: 1234 }, results: [{ ... }, ...] }
-app.get("/api/tag/:slug", async (req, res) => {
+// app.get("/api/tag/:slug", async (req, res) => {
+//   const slug = req.params.slug;
+//   const results = await findQuotesByTagSlug(slug);
+
+//   res.send(results);
+// });
+
+// the supplied req.body is a list of quote IDs that have already been used
+// will return a random quote that has not been used yet by checking the IDs
+app.post("/api/tag/:slug", async (req, res) => {
+  console.log(req.body);
+  if(req.body === undefined) {
+    res.status(400).send({ error: "No body supplied." });
+    res.end();
+    return;
+  }
   const slug = req.params.slug;
-  const results = await findQuotesByTagSlug(slug);
-  res.send(results);
+  const usedIDs = req.body.usedIDs as string[] ?? [];
+
+  let randomQuotes = await findQuotesByTagSlug(slug);
+  
+  if(randomQuotes.quotes.length === usedIDs.length) {
+    res.status(204).send({ error: "No more quotes." });
+    res.end();
+    return;
+  }
+
+  let foundQuote: Quote | undefined = undefined;
+
+  for(let i = 0; i < 10; i++) {
+    const unusedQuotes = randomQuotes.quotes.filter(q => !usedIDs.includes(q._id));
+    if(unusedQuotes.length > 0) {
+      const randomQuote = unusedQuotes[0];
+      foundQuote = randomQuote;
+      break;
+    } else {
+      randomQuotes = await findQuotesByTagSlug(slug);
+    }
+  }
+
+  if(!foundQuote) {
+    res.status(204).send({ error: "No more quotes." });
+    res.end();
+    return;
+  }
+
+  const newQuote = await getAlternateQuote(foundQuote.content);
+  const author = await findAuthorBySlug(foundQuote.authorSlug);
+
+  const newID = foundQuote._id.split("").reverse().join("");
+
+  res.status(200).send({
+    author,
+    quotes: [
+      { _id: foundQuote._id, content: foundQuote.content },
+      { _id: newID, content: newQuote }
+    ]
+  });
+  res.end();
 });
 
 app.listen(3000, () => {
